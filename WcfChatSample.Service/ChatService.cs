@@ -84,7 +84,7 @@ namespace WcfChatSample.Service
             var msg = new ChatMessage()
             {
                 Date = DateTime.Now,
-                Message = message,
+                Text = message,
                 Username = user.Username
             };
 
@@ -106,7 +106,7 @@ namespace WcfChatSample.Service
                         return new ChatMessage()
                             {
                                 Date = msg.Date,
-                                Message = msg.Message,
+                                Text = msg.Text,
                                 Username = msg.Username
                             };
                     }
@@ -203,7 +203,7 @@ namespace WcfChatSample.Service
             try
             {
                 var msgs = _db.GetLastMessages(user.IsAdmin ? null : (int?)10)
-                    .Select(msg => new ChatMessage() { Date = msg.Date, Message = msg.Message, Username = msg.Username })
+                    .Select(msg => new ChatMessage() { Date = msg.Date, Text = msg.Text, Username = msg.Username })
                     .ToArray();
 
                 return msgs;

@@ -55,7 +55,7 @@ namespace WcfChatSample.Service
         public string Username { get; set; }
 
         [DataMember]
-        public string Message { get; set; }
+        public string Text { get; set; }
     }
 
     [DataContract]

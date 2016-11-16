@@ -12,7 +12,7 @@ namespace WcfChatSample.Service
     
     public interface IDbProvider
     {
-        bool AddMessage(IDbMessage message);
+        void AddMessage(IDbMessage message);
 
         IDbMessage[] GetLastMessages(int? count);
 
@@ -23,6 +23,6 @@ namespace WcfChatSample.Service
     {
         DateTime Date { get; }
         string Username { get; }
-        string Message { get; }
+        string Text { get; }
     }
 }
