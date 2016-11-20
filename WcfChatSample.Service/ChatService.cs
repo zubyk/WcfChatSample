@@ -134,35 +134,30 @@ namespace WcfChatSample.Service
         {
             UserCredentials user = null;
             UserCredentials toDisconnect = null;
-            List<UserCredentials> creds = null;
+            List<UserCredentials> creds = null;        
+
             lock (_creds_lock)
             {
                 user = GetUserByKey(key);
-                creds = _creds.Values.ToList();
 
-                toDisconnect = creds.FirstOrDefault(crd => crd.Username == username);
+                if (!user.IsAdmin)
+                {
+                    return;
+                }
+
+                if (String.IsNullOrWhiteSpace(username))
+                {
+                    username = user.Username;
+                }
+
+                toDisconnect = _creds.Values.FirstOrDefault(crd => crd.Username == username );
 
                 if (toDisconnect != null)
                 {
                     _creds.Remove(toDisconnect.Key);
                 }
-            }
 
-            try
-            {
-                if (toDisconnect != null)
-                {
-                    creds.RemoveAll(crd => crd.Username == username);
-
-                    if ((((ICommunicationObject)toDisconnect.Callback).State == CommunicationState.Opened))
-                    {
-                        toDisconnect.Callback.OnDisconnect();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log("Callback OnDisconnect() error for user \"{0}\": {1}", toDisconnect.Username, e.Message);
+                creds = _creds.Values.ToList();
             }
 
             Task.Factory.StartNew(() =>

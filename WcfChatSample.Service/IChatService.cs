@@ -40,9 +40,6 @@ namespace WcfChatSample.Service
 
         [OperationContract(IsOneWay = true)]
         void OnUsersListChange(string[] users);
-
-        [OperationContract(IsOneWay = true)]
-        void OnDisconnect();
     }
 
     [DataContract]

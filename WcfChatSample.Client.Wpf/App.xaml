@@ -1,8 +1,12 @@
 ﻿<Application x:Class="WcfChatSample.Client.Wpf.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cmds="clr-namespace:WcfChatSample.Client.Wpf.Commands"
+             xmlns:data="clr-namespace:WcfChatSample.Client.Wpf.Data"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <cmds:CommandManager x:Key="Commands"/>
+
+        <ObjectDataProvider x:Key="appData" ObjectType="{x:Type data:DataSource}" MethodName="GetInstance"/>
     </Application.Resources>
 </Application>

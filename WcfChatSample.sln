@@ -1,11 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfChatSample.Server", "WcfChatSample.Server\WcfChatSample.Server.csproj", "{3BD372D7-02FC-4B84-8B5F-7D2402A020B6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfChatSample.Client.Wpf", "WcfChatSample.Client.Wpf\WcfChatSample.Client.Wpf.csproj", "{B1D2E279-D355-4192-BBA4-E7757CD4FD47}"
+	ProjectSection(ProjectDependencies) = postProject
+		{61643DB8-3F28-4FDB-A1E0-C4F3C31E0511} = {61643DB8-3F28-4FDB-A1E0-C4F3C31E0511}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfChatSample.Service", "WcfChatSample.Service\WcfChatSample.Service.csproj", "{61643DB8-3F28-4FDB-A1E0-C4F3C31E0511}"
 EndProject
