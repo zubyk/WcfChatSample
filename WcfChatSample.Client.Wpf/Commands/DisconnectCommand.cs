@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Input;
 
 namespace WcfChatSample.Client.Wpf.Commands
@@ -29,7 +28,7 @@ namespace WcfChatSample.Client.Wpf.Commands
                 
                 if (usr != null)
                 {
-                    Data.DataSource.Current.Post(String.IsNullOrEmpty(usr) ? null : usr);
+                    Data.DataSource.Current.Disconnect(String.IsNullOrEmpty(usr) ? null : usr);
                 }
             }
         }

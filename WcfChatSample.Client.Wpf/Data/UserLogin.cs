@@ -1,28 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security;
 
 namespace WcfChatSample.Client.Wpf.Data
 {
-    internal class UserLogin
+    public class UserLogin
     {
         public string Username { get; private set; }
-        public string Password { get; private set; }
+        public SecureString SecurePassword { get; private set; }
 
         public bool IsValid
         {
             get
             {
-                return !String.IsNullOrWhiteSpace(Username) && !String.IsNullOrWhiteSpace(Password); 
+                return !String.IsNullOrWhiteSpace(Username) && SecurePassword != null && SecurePassword.Length > 0; 
             }
         }
 
-        public UserLogin(string username, string password)
+        public UserLogin(string username, SecureString password)
         {
             Username = username;
-            Password = password;
+            SecurePassword = password;
         }
     }
 }

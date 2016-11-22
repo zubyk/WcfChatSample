@@ -7,22 +7,22 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="UserCredentials" nillable="true" type="tns:UserCredentials" />
-  <xs:complexType name="UserLoginFault">
-    <xs:sequence />
-  </xs:complexType>
-  <xs:element name="UserLoginFault" nillable="true" type="tns:UserLoginFault" />
   <xs:complexType name="ServerInternalFault">
     <xs:sequence />
   </xs:complexType>
   <xs:element name="ServerInternalFault" nillable="true" type="tns:ServerInternalFault" />
-  <xs:complexType name="UserSessionTimeoutFault">
+  <xs:complexType name="UserLoginFault">
     <xs:sequence />
   </xs:complexType>
-  <xs:element name="UserSessionTimeoutFault" nillable="true" type="tns:UserSessionTimeoutFault" />
+  <xs:element name="UserLoginFault" nillable="true" type="tns:UserLoginFault" />
   <xs:complexType name="UserKeyFault">
     <xs:sequence />
   </xs:complexType>
   <xs:element name="UserKeyFault" nillable="true" type="tns:UserKeyFault" />
+  <xs:complexType name="UserSessionTimeoutFault">
+    <xs:sequence />
+  </xs:complexType>
+  <xs:element name="UserSessionTimeoutFault" nillable="true" type="tns:UserSessionTimeoutFault" />
   <xs:complexType name="ArrayOfChatMessage">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="ChatMessage" nillable="true" type="tns:ChatMessage" />

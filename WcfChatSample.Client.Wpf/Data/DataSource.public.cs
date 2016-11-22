@@ -1,23 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Xml;
-using System.Windows;
 using System.Reflection;
-using WcfChatSample.Client.Wpf.ServiceReference;
-using WcfChatSample.Client.Wpf.Extensions;
 using System.ServiceModel;
+using System.Threading.Tasks;
+using System.Windows;
+using WcfChatSample.Client.Wpf.Extensions;
+using WcfChatSample.Client.Wpf.ServiceReference;
 
 namespace WcfChatSample.Client.Wpf.Data
 {
     partial class DataSource
-    {   
+    {
         public string ProductName
         {
             get
@@ -65,7 +59,7 @@ namespace WcfChatSample.Client.Wpf.Data
             }
         }
 
-        public async void Connect(string username, string password)
+        public async void Connect(UserLogin login)
         {
             if (!IsConnected && !IsAsyncProcessing)
             {
@@ -74,10 +68,15 @@ namespace WcfChatSample.Client.Wpf.Data
                 {
                     InitClient();
 
-                    var creds =  await _client.LoginAsync(username, password);
-
+                    var creds = await login.SecurePassword.ProcessPasswordAsync(async (pass) => 
+                    {
+                        return await _client.LoginAsync(login.Username, pass);
+                    });
+                    
                     _key = creds.Key;
+                    _username = login.Username;
                     IsAdmin = creds.IsAdmin;
+                    OnPropertyChanged("IsAdmin");
                 }
                 catch (FaultException<UserLoginFault>)
                 {
@@ -99,6 +98,8 @@ namespace WcfChatSample.Client.Wpf.Data
                     IsAsyncProcessing = false;
                     OnPropertyChanged("IsConnected");
                 }
+
+                Refresh();
             }
         }
 
@@ -131,7 +132,12 @@ namespace WcfChatSample.Client.Wpf.Data
                 try
                 {
                     var msgs = await _client.RefreshAsync(_key);
-                    Messages = new ObservableCollection<ChatMessage>(msgs);
+                    
+                    lock (_messages_lock)
+                    {
+                        Messages = new ObservableCollection<ChatMessage>(msgs.OrderBy(m => m.Date));
+                    }
+
                     OnPropertyChanged("Messages");
                 }
                 catch (FaultException<ServerInternalFault>)
@@ -155,7 +161,7 @@ namespace WcfChatSample.Client.Wpf.Data
             }
         }
 
-        public async void Post(string message)
+        public async Task<bool> Post(string message)
         {
             if (IsConnected && !IsAsyncProcessing)
             {
@@ -163,6 +169,7 @@ namespace WcfChatSample.Client.Wpf.Data
                 try
                 {
                     await _client.PostAsync(_key, message);
+                    return true;
                 }
                 catch (FaultException<ServerInternalFault>)
                 {
@@ -183,6 +190,8 @@ namespace WcfChatSample.Client.Wpf.Data
                     IsAsyncProcessing = false;
                 }
             }
+
+            return false;
         }
     }
 }

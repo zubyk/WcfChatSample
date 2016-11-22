@@ -10,6 +10,14 @@ namespace WcfChatSample.Client.Wpf.Commands
             
         }
 
+        public static void FireCanExecuteChanged(ICommand command)
+        {
+            if (command is ChatCommandBase)
+            {
+                (command as ChatCommandBase).FireCanExecuteChanged();
+            }
+        }
+        
         private class ChatCommandBase : ICommand
         {           
             public virtual bool CanExecute(object parameter)
@@ -23,6 +31,11 @@ namespace WcfChatSample.Client.Wpf.Commands
             }
             
             public event EventHandler CanExecuteChanged = delegate { };
+
+            public void FireCanExecuteChanged()
+            {
+                CanExecuteChanged(this, new EventArgs());
+            }
 
             public ChatCommandBase()
             {

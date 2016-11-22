@@ -66,10 +66,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\ShowLoginWindowCommand.cs" />
     <Compile Include="Commands\ConnectCommand.cs" />
     <Compile Include="Commands\DisconnectCommand.cs" />
     <Compile Include="Commands\RefreshCommand.cs" />
+    <Compile Include="Converters\ChatMessageConverter.cs" />
+    <Compile Include="Data\UserEntity.cs" />
     <Compile Include="Data\UserLogin.cs" />
+    <Compile Include="Extensions\SecureStringExtension.cs" />
+    <Compile Include="LoginWindow.xaml.cs">
+      <DependentUpon>LoginWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Service References\ChatServiceCallback.cs" />
     <Compile Include="Commands\CommandManager.cs" />
     <Compile Include="Commands\PostMessageCommand.cs" />
@@ -82,6 +89,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Page Include="LoginWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -160,9 +171,7 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Converters\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -71,9 +71,4 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="OnDisconnect">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
 </xs:schema>

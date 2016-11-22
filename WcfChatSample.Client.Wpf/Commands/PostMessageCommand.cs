@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Input;
 
 namespace WcfChatSample.Client.Wpf.Commands
@@ -16,20 +15,22 @@ namespace WcfChatSample.Client.Wpf.Commands
             }
         }
 
+        public static event EventHandler<bool> MessagePosted = delegate { };
+
         private class PostMessageCommand : ChatCommandBase
         {
             public override bool CanExecute(object parameter)
             {
-                return parameter is String && base.CanExecute(parameter) && Data.DataSource.Current.IsConnected;
+                return !String.IsNullOrWhiteSpace(parameter as String) && base.CanExecute(parameter) && Data.DataSource.Current.IsConnected;
             }
-            
-            public override void Execute(object parameter)
-            {
-                var msg = parameter as String;
 
-                if (msg != null)
+            public override async void Execute(object parameter)
+            {
+                if (CanExecute(parameter))
                 {
-                    Data.DataSource.Current.Post(msg);
+                    var result = await Data.DataSource.Current.Post(parameter as String);
+
+                    CommandManager.MessagePosted(this, result);
                 }
             }
         }

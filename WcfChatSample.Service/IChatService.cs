@@ -31,6 +31,12 @@ namespace WcfChatSample.Service
         [FaultContractAttribute(typeof(UserSessionTimeoutFault))]
         [FaultContractAttribute(typeof(ServerInternalFault))]
         ChatMessage[] Refresh(string key);
+
+        [OperationContract]
+        [FaultContractAttribute(typeof(UserKeyFault))]
+        [FaultContractAttribute(typeof(UserSessionTimeoutFault))]
+        [FaultContractAttribute(typeof(ServerInternalFault))]
+        string[] RefreshUsers(string key);
     }
 
     public interface IChatServiceCallback

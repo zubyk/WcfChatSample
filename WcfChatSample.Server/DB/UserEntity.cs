@@ -21,7 +21,6 @@ namespace WcfChatSample.Server.DB
         public string Username { get; set; }
 
         [Required]
-        [MaxLength(50)]
         [Column("Password")]
         public byte[] Password { get; set; }
 

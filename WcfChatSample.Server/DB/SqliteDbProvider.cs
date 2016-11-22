@@ -52,7 +52,7 @@ namespace WcfChatSample.Server.DB
                 if (usr == null)
                 {
                     usr = new UserEntity() { Username = username, IsAdmin = false };
-                    usr.Password = GeneratePassword(usr, password);
+                    usr.Password = ProtectPassword(usr, password);
 
                     _db.Users.Add(usr);
                     _db.SaveChanges();
@@ -61,9 +61,9 @@ namespace WcfChatSample.Server.DB
                 }
             }
 
-            var pass = GeneratePassword(new UserEntity() { Username = username }, password);
+            var pass = UnprotectPassword(usr, usr.Password);
 
-            if (pass.Equals(usr.Password))
+            if (pass.Equals(password))
             {
                 return usr.IsAdmin ? LoginResult.Admin : LoginResult.User;
             }
@@ -74,7 +74,7 @@ namespace WcfChatSample.Server.DB
         public void SetAdmin(string username, string password)
         {
             var usr = new UserEntity() { Username = username, IsAdmin = true };
-            usr.Password = GeneratePassword(usr, password);
+            usr.Password = ProtectPassword(usr, password);
 
             lock (_users_lock)
             {
@@ -92,16 +92,14 @@ namespace WcfChatSample.Server.DB
             }
         }
 
-        private byte[] GeneratePassword(UserEntity usr, string password)
+        private byte[] ProtectPassword(UserEntity usr, string password)
         {
-            var encrypted = new List<byte> (ProtectedData.Protect(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(usr.Username), DataProtectionScope.LocalMachine));
+            return ProtectedData.Protect(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(usr.Username), DataProtectionScope.LocalMachine);
+        }
 
-            while(encrypted.Count < 50)
-            {
-                encrypted.Add(encrypted[encrypted.Count / 2]);
-            }
-
-            return encrypted.Take(50).ToArray();
+        private string UnprotectPassword(UserEntity usr, byte[] data)
+        {
+            return Encoding.UTF8.GetString(ProtectedData.Unprotect(data, Encoding.UTF8.GetBytes(usr.Username), DataProtectionScope.LocalMachine));
         }
     }
 }

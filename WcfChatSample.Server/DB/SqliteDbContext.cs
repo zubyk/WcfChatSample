@@ -33,7 +33,7 @@ namespace WcfChatSample.Server.DB
                 CREATE TABLE IF NOT EXISTS [Users] (
                     [Id] integer UNIQUE NOT NULL
                     , [Username] nvarchar(50) NOT NULL
-                    , [Password] binary(50) NOT NULL
+                    , [Password] binary NOT NULL
                     , [IsAdmin] bit NOT NULL DEFAULT 0
                     , PRIMARY KEY (Id)   
                 );";

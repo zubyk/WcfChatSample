@@ -1,7 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Text;
-using System.Xml.Schema;
 using WcfChatSample.Client.Wpf.Extensions;
 
 namespace WcfChatSample.Client.Wpf.Data

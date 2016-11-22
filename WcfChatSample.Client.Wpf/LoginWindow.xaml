@@ -1,0 +1,23 @@
+﻿<Window x:Class="WcfChatSample.Client.Wpf.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Log in" Height="135" Width="250" WindowStyle="ToolWindow">
+    <Grid Margin="3">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="65"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Label Grid.Row="0" Grid.Column="0">Login:</Label>
+        <Label Grid.Row="1" Grid.Column="0">Password:</Label>
+        <TextBox x:Name="loginBox" Grid.Row="0" Grid.Column="1" VerticalContentAlignment="Center" Height="25"  TextChanged="loginBox_TextChanged" Margin="0,0,0,6"></TextBox>
+        <PasswordBox x:Name="passwordBox" Grid.Row="1" Grid.Column="1" VerticalContentAlignment="Center" Height="25" PasswordChar="*" PasswordChanged="passwordBox_PasswordChanged"/>
+        <Button x:Name="loginButton"  Height="25" Width="100" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" IsEnabled="False" IsDefault="True" Click="loginButton_Click">
+            Log in
+        </Button>
+    </Grid>
+</Window>

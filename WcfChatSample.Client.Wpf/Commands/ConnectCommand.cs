@@ -1,6 +1,5 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Input;
+﻿using System.Windows.Input;
+using WcfChatSample.Client.Wpf.Data;
 
 namespace WcfChatSample.Client.Wpf.Commands
 {
@@ -21,15 +20,14 @@ namespace WcfChatSample.Client.Wpf.Commands
             public override bool CanExecute(object parameter)
             {
                 var usr = parameter as Data.UserLogin;
-                return usr != null && usr.IsValid && base.CanExecute(parameter);
+                return usr != null && usr.IsValid && !Data.DataSource.Current.IsConnected && base.CanExecute(parameter);
             }
 
             public override void Execute(object parameter)
             {
                 if (CanExecute(parameter))
                 {
-                    var usr = parameter as Data.UserLogin;
-                    Data.DataSource.Current.Connect(usr.Username, usr.Password);
+                    Data.DataSource.Current.Connect(parameter as Data.UserLogin);
                 }
             }
         }

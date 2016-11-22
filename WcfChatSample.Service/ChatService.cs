@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WcfChatSample.Service
@@ -26,9 +27,50 @@ namespace WcfChatSample.Service
             }
 
             _db = db;
-            _creds = new Dictionary<string, UserCredentials>();
         }
         
+        public ChatService()
+        {
+            _creds = new Dictionary<string, UserCredentials>();
+
+            Task.Factory.StartNew(() =>
+            {
+                Thread.Sleep(5000);
+
+                try
+                {
+                    List<UserCredentials> creds = null;
+                    lock (_creds_lock)
+                    {
+                        foreach (var crd in _creds.Values.ToArray())
+                        {
+                            switch (((ICommunicationObject)crd.Callback).State)
+                            {
+                                case CommunicationState.Closed:
+                                case CommunicationState.Faulted:
+                                case CommunicationState.Closing:
+                                    _creds.Remove(crd.Key);
+                                    break;
+                            }
+                        }
+
+                        creds = _creds.Values.ToList();
+                    }
+
+                    var usrs = creds.Select(c => c.Username).ToArray();
+
+                    foreach (var crd in creds)
+                    {
+                        crd.Callback.OnUsersListChange(usrs);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log("Error on userlist update: {0}", e.Message);
+                }
+            });
+        }
+
         public UserCredentials Login(string username, string password)
         {
             LoginResult result = LoginResult.None;
@@ -55,7 +97,7 @@ namespace WcfChatSample.Service
                     }
 
                     var callback = OperationContext.Current.GetCallbackChannel<IChatServiceCallback>();
-                    creds = new UserCredentials() { Key = Guid.NewGuid().ToString(), IsAdmin = result == LoginResult.Admin, Callback = callback };
+                    creds = new UserCredentials() { Key = Guid.NewGuid().ToString(), Username = username, IsAdmin = result == LoginResult.Admin, Callback = callback };
 
                     _creds.Add(creds.Key, creds);
                 }
@@ -91,6 +133,7 @@ namespace WcfChatSample.Service
             try 
             {
                 _db.AddMessage(msg);
+                Log("User \"{0}\" post new message", user.Username);
             }
             catch (Exception e)
             {
@@ -134,57 +177,73 @@ namespace WcfChatSample.Service
         {
             UserCredentials user = null;
             UserCredentials toDisconnect = null;
-            List<UserCredentials> creds = null;        
+            List<UserCredentials> creds = null;
 
             lock (_creds_lock)
             {
                 user = GetUserByKey(key);
 
-                if (!user.IsAdmin)
-                {
-                    return;
-                }
-
                 if (String.IsNullOrWhiteSpace(username))
                 {
                     username = user.Username;
                 }
-
-                toDisconnect = _creds.Values.FirstOrDefault(crd => crd.Username == username );
-
-                if (toDisconnect != null)
+                
+                if (user.IsAdmin || user.Username == username)
                 {
-                    _creds.Remove(toDisconnect.Key);
+                    toDisconnect = _creds.Values.FirstOrDefault(crd => crd.Username == username);
+
+                    if (toDisconnect != null)
+                    {
+                        _creds.Remove(toDisconnect.Key);
+                    }
+
+                    creds = _creds.Values.ToList();
+                }
+            }
+            if (creds == null)
+            {
+                Log("Error attempt of disconnect user \"{0}\" by user \"{1}\"", username, user.Username);
+            }
+            else
+            {
+                if (user.Username == username)
+                {
+                    Log("User \"{0}\" disconnected", user.Username);
+                }
+                else
+                {
+                    Log("User \"{0}\" disconnect user \"{1}\"", user.Username, username);
                 }
 
-                creds = _creds.Values.ToList();
+                if (creds.Any())
+                {
+                    Task.Factory.StartNew(() =>
+                    {
+                        var users = creds.Where(crd => ((ICommunicationObject)crd.Callback).State == CommunicationState.Opened && crd.Username != username)
+                            .Select(c => c.Username).ToArray();
+
+                        Parallel.ForEach(creds.Where(crd => users.Contains(crd.Username))
+                        , () =>
+                            {
+                                return (string[])users.Clone();
+                            }
+                        , (cred, loopState, usrs) =>
+                            {
+                                try
+                                {
+                                    cred.Callback.OnUsersListChange(usrs);
+                                }
+                                catch (Exception e)
+                                {
+                                    Log("Callback OnUsersListChange() error for user \"{0}\": {1}", cred.Username, e.Message);
+                                }
+
+                                return usrs;
+                            }
+                        , (usrs) => { usrs = null; });
+                    });
+                }
             }
-
-            Task.Factory.StartNew(() =>
-            {
-                var users = creds.Where(crd => ((ICommunicationObject)crd.Callback).State == CommunicationState.Opened && crd.Username != username)
-                    .Select(c => c.Username).ToArray();
-
-                Parallel.ForEach(creds.Where(crd => users.Contains(crd.Username))
-                , () =>
-                    {
-                        return (string[])users.Clone();
-                    }
-                , (cred, loopState, usrs) =>
-                    {
-                        try
-                        {
-                            cred.Callback.OnUsersListChange(usrs);
-                        }
-                        catch (Exception e)
-                        {
-                            Log("Callback OnUsersListChange() error for user \"{0}\": {1}", cred.Username, e.Message);
-                        }
-
-                        return usrs;
-                    }
-                , (usrs) => { usrs = null; });
-            });
         }
 
         public ChatMessage[] Refresh(string key)
@@ -194,7 +253,9 @@ namespace WcfChatSample.Service
             {
                 user = GetUserByKey(key);
             }
-            
+
+            Log("User \"{0}\" requested data refresh", user.Username);
+
             try
             {
                 var msgs = _db.GetLastMessages(user.IsAdmin ? null : (int?)10)
@@ -206,6 +267,28 @@ namespace WcfChatSample.Service
             catch (Exception e)
             {
                 Log("DB error: {0}", e.Message);
+                throw new FaultException<ServerInternalFault>(new ServerInternalFault());
+            }
+        }
+
+        public string[] RefreshUsers(string key)
+        {
+            UserCredentials user = null;
+            lock (_creds_lock)
+            {
+                user = GetUserByKey(key);
+            }
+
+            Log("User \"{0}\" requested userlist refresh", user.Username);
+
+            try
+            {
+                var usrs = _creds.Values.Select(crd => crd.Username).ToArray();
+                return usrs;
+            }
+            catch (Exception e)
+            {
+                Log("Error processing userlist: {0}", e.Message);
                 throw new FaultException<ServerInternalFault>(new ServerInternalFault());
             }
         }
