@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WcfChatSample.Service;
+﻿using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
+using WcfChatSample.Service;
 
 namespace WcfChatSample.Server.DB
 {
