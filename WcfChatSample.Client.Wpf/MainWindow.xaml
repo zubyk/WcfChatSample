@@ -29,20 +29,19 @@
             <Button Height="25" DockPanel.Dock="Top" Command="{Binding ShowLoginWindow, Source={StaticResource ResourceKey=Commands}}" Margin="0,0,0,3" Visibility="{calc:Binding Path=!IsConnected, FalseToVisibility=Collapsed}">Connect</Button>
             <Button Height="25" DockPanel.Dock="Top" Command="{Binding Disconnect, Source={StaticResource ResourceKey=Commands}}" CommandParameter="" Margin="0,0,0,3" Visibility="{calc:Binding Path=IsConnected, FalseToVisibility=Collapsed}">Disconnect</Button>
             <Button Height="25" DockPanel.Dock="Top" Command="{Binding Refresh, Source={StaticResource ResourceKey=Commands}}" Visibility="{calc:Binding Path=IsConnected, FalseToVisibility=Collapsed}">Refresh</Button>
-            <Label DockPanel.Dock="Top" VerticalContentAlignment="Bottom" Height="25" Visibility="{calc:Binding Path=IsConnected, FalseToVisibility=Hidden}" Margin="0,0,0,3">Users:</Label>
-            <ScrollViewer Margin="3" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Visibility="{calc:Binding Path=IsConnected, FalseToVisibility=Hidden}">
-                <ItemsControl Padding="3,3,3,3" ItemsSource="{Binding Users, Mode=OneWay}" >
+            <Label DockPanel.Dock="Top" VerticalContentAlignment="Bottom" Height="25" Padding="0" Visibility="{calc:Binding Path=IsConnected, FalseToVisibility=Hidden}" Margin="0,0,0,3">Users:</Label>
+            <ScrollViewer Margin="3,0,3,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Visibility="{calc:Binding Path=IsConnected, FalseToVisibility=Hidden}">
+                <ItemsControl Margin="3,0,3,3" ItemsSource="{Binding Users, Mode=OneWay}" >
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <StackPanel Orientation="Vertical">
-                            </StackPanel>
-                        </ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" />
+                          </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Background="White" Loaded="StackPanel_Loaded">
+                            <StackPanel Orientation="Horizontal" Background="White" Loaded="StackPanel_Loaded" Height="20">
                                 <StackPanel.Resources>
-                                    <Style TargetType="TextBlock">
+                                    <Style TargetType="Label">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsSelf}" Value="True">
                                                 <DataTrigger.Setters>
@@ -51,9 +50,23 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
+                                    <Style TargetType="Button">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsAdmin, Source={StaticResource appData}}" Value="False">
+                                                <DataTrigger.Setters>
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger.Setters>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsSelf}" Value="True">
+                                                <DataTrigger.Setters>
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger.Setters>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
                                 </StackPanel.Resources>
-                                <TextBlock Text="{Binding Username}" />
-                                <Button Command="{Binding Disconnect, Source={StaticResource Commands}}" CommandParameter="{Binding Username}" Visibility="{calc:Binding IsAdmin, Source={StaticResource appData}, FalseToVisibility=Hidden}">X</Button>
+                                <Button Command="{Binding DisconnectUser, Source={StaticResource Commands}}" CommandParameter="{Binding .}" Margin="0,0,3,0" Foreground="Red" FontSize="10" VerticalAlignment="Stretch" FontWeight="Bold" BorderBrush="Transparent" Background="Transparent">X</Button>
+                                <Label Margin="0" Padding="0" Content="{Binding Username}" VerticalAlignment="Stretch" VerticalContentAlignment="Center" />
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -84,16 +97,9 @@
                                     </BeginStoryboard>
                                 </EventTrigger>
                             </StackPanel.Triggers>
-                            <TextBlock>
-                                <TextBlock.Inlines>
-                                    <Run Text="[" />
-                                    <Run Text="{Binding Date}"></Run>
-                                    <Run Text="] " />
-                                    <Run FontWeight="Bold" Foreground="Blue" Text="{Binding Username}" />
-                                    <Run Text=":" />
-                                    <Run Text="{Binding Text}" />
-                                </TextBlock.Inlines>
-                            </TextBlock>
+                            <Label Margin="0" Padding="0" Content="{Binding Date}" ContentStringFormat="{}[{0:H:mm:ss}]"></Label>
+                            <Label Margin="0" Padding="0" Content="{Binding Username}" FontWeight="Bold" Foreground="Blue" ContentStringFormat="{} {0}:"></Label>
+                            <Label Margin="0" Padding="0" Content="{Binding Text}" ContentStringFormat="{} {0}"></Label>
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

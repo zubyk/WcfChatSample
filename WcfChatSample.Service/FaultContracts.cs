@@ -3,14 +3,6 @@
 namespace WcfChatSample.Service
 {
     [DataContractAttribute]
-    public class UserKeyFault
-    {
-        public UserKeyFault()
-        {
-        }
-    }
-
-    [DataContractAttribute]
     public class UserLoginFault
     {
         public UserLoginFault()
@@ -22,6 +14,14 @@ namespace WcfChatSample.Service
     public class UserSessionTimeoutFault
     {
         public UserSessionTimeoutFault()
+        {
+        }
+    }
+
+    [DataContractAttribute]
+    public class UserLoginRequiredFault
+    {
+        public UserLoginRequiredFault()
         {
         }
     }

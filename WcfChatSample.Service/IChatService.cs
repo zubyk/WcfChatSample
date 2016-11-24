@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
-using System.Text;
 
 namespace WcfChatSample.Service
 {
@@ -16,27 +13,21 @@ namespace WcfChatSample.Service
         UserCredentials Login(string username, string password);
 
         [OperationContract]
-        [FaultContractAttribute(typeof(UserKeyFault))]
+        [FaultContractAttribute(typeof(UserLoginRequiredFault))]
         [FaultContractAttribute(typeof(UserSessionTimeoutFault))]
         [FaultContractAttribute(typeof(ServerInternalFault))]
-        void Post(string key, string message);
+        void Post(string message);
         
         [OperationContract]
-        [FaultContractAttribute(typeof(UserKeyFault))]
+        [FaultContractAttribute(typeof(UserLoginRequiredFault))]
         [FaultContractAttribute(typeof(UserSessionTimeoutFault))]
-        void DisconnectUser(string key, string username);
+        void DisconnectUser(string username);
 
         [OperationContract]
-        [FaultContractAttribute(typeof(UserKeyFault))]
+        [FaultContractAttribute(typeof(UserLoginRequiredFault))]
         [FaultContractAttribute(typeof(UserSessionTimeoutFault))]
         [FaultContractAttribute(typeof(ServerInternalFault))]
-        ChatMessage[] Refresh(string key);
-
-        [OperationContract]
-        [FaultContractAttribute(typeof(UserKeyFault))]
-        [FaultContractAttribute(typeof(UserSessionTimeoutFault))]
-        [FaultContractAttribute(typeof(ServerInternalFault))]
-        string[] RefreshUsers(string key);
+        ChatMessage[] Refresh();
     }
 
     public interface IChatServiceCallback
@@ -64,14 +55,52 @@ namespace WcfChatSample.Service
     [DataContract]
     public class UserCredentials
     {
+        private static int _lastID = 1;
+        
         [DataMember]
-        public bool IsAdmin { get; set; }
+        public UserRole Role { get; set; }
 
-        [DataMember]
-        public string Key { get; set; }
+        internal string Username { get; set; }
 
         internal IChatServiceCallback Callback { get; set; }
 
-        internal string Username { get; set; }
+        internal int ID { get; private set; }
+
+        internal ICommunicationObject Channel
+        {
+            get
+            {
+                return Callback as ICommunicationObject;
+            }
+        }
+
+        public UserCredentials()
+        {
+            ID = _lastID++;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("#{0} '{1}'", ID, Username);
+        }
+
+        public override int GetHashCode()
+        {
+            return ID.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var usr = obj as UserCredentials;
+
+            return usr != null ? usr.ID == ID : false;
+        }
+    }
+
+    public enum UserRole : byte
+    {
+        None,
+        User,
+        Admin
     }
 }

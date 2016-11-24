@@ -1,33 +1,36 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.ServiceModel;
+using System.Windows.Threading;
 using WcfChatSample.Client.Wpf.ServiceReference;
 
 namespace WcfChatSample.Client.Wpf.Data
 {
-    public partial class DataSource : INotifyPropertyChanged
+    internal partial class DataSource : INotifyPropertyChanged
     {
         private ChatServiceClient _client;
         private ChatServiceCallback _callback;  
 
         private bool _isAsyncProcessing = false;
-        private string _key;
-        private string _username;   
+        private bool _isAdmin;
+        private string _username;
 
         private object _messages_lock = new object();
         private object _users_lock = new object();
 
         public ObservableCollection<ChatMessage> Messages { get; private set; }
-        public ObservableCollection<UserEntity> Users { get; private set; }
+        public ObservableCollection<UserLogin> Users { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        private ICommunicationObject _channel;
 
         private DataSource()
         {
             Messages = new ObservableCollection<ChatMessage>();
-            Users = new ObservableCollection<UserEntity>();
+            Users = new ObservableCollection<UserLogin>();
         }
 
         private void OnPropertyChanged([CallerMemberName] string property = null)
@@ -39,8 +42,11 @@ namespace WcfChatSample.Client.Wpf.Data
         {
             lock (_users_lock)
             {
-                Users = new ObservableCollection<UserEntity>(e.OrderBy(u => u).Select(u => new UserEntity(u, u == _username)));
+                Users = new ObservableCollection<UserLogin>(e.OrderBy(u => u)
+                    .Where(u => !String.IsNullOrEmpty(u))
+                    .Select(u => new UserLogin(u, u == _username)));
             }
+
             OnPropertyChanged("Users");
         }
 
@@ -82,32 +88,74 @@ namespace WcfChatSample.Client.Wpf.Data
         }
 
         private void InitClient()
-        {           
-            _callback = new ChatServiceCallback();
-            _callback.MessagePost += callback_MessagePost;
-            _callback.UsersListChange += callback_UsersListChange;
+        {
+            try
+            {
+                _callback = new ChatServiceCallback();
+                _callback.MessagePost += callback_MessagePost;
+                _callback.UsersListChange += callback_UsersListChange;
 
-            _client = new ChatServiceClient(new InstanceContext(_callback));
+                _client = new ChatServiceClient(new InstanceContext(_callback));
+                
+                _client.InnerDuplexChannel.Closing += InnerChannel_Closed;
+                _client.InnerDuplexChannel.Closed += InnerChannel_Closed;
+                _client.InnerDuplexChannel.Faulted += InnerChannel_Closed;
+
+                IsConnected = true;
+            }
+            catch
+            {
+                CloseClient();
+                throw;
+            }
+        }
+
+        private void InnerChannel_Closed(object sender, System.EventArgs e)
+        {
+            App.Current.Dispatcher.Invoke(() => CloseClient());
         }
 
         private void CloseClient()
         {
-            if (_callback != null)
+            try
             {
-                _callback.MessagePost -= callback_MessagePost;
-                _callback.UsersListChange -= callback_UsersListChange;
-            }
+                if (_callback != null)
+                {
+                    _callback.MessagePost -= callback_MessagePost;
+                    _callback.UsersListChange -= callback_UsersListChange;
 
-            if (_client != null && (
-                _client.State == CommunicationState.Created || 
-                _client.State == CommunicationState.Opened || 
-                _client.State == CommunicationState.Opening))
+                    _callback = null;
+                }
+
+                if (_client != null)
+                {
+                    _client.InnerDuplexChannel.Closing -= InnerChannel_Closed;
+                    _client.InnerDuplexChannel.Closed -= InnerChannel_Closed;
+                    _client.InnerDuplexChannel.Faulted -= InnerChannel_Closed;
+                    
+                    switch (_client.State)
+                    {
+                        case CommunicationState.Opened:
+                        case CommunicationState.Opening:
+                        case CommunicationState.Created:
+                            _client.Abort();
+                            break;
+                    }
+
+                    _client = null;
+                }
+            }
+            catch
             {
-                _client.Close();
+                _callback = null;
+                _client = null;
             }
-
-            _client = null;
-            _callback = null;
+            finally
+            {
+                _username = null;
+                IsAdmin = false;
+                IsConnected = false;
+            }
         }
     }
 }

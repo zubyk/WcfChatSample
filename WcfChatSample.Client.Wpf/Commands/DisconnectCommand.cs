@@ -19,16 +19,14 @@ namespace WcfChatSample.Client.Wpf.Commands
         {
             public override bool CanExecute(object parameter)
             {
-                return parameter is String && base.CanExecute(parameter) && Data.DataSource.Current.IsConnected;
+                return base.CanExecute(parameter) && Data.DataSource.Current.IsConnected;
             }
             
             public override void Execute(object parameter)
             {
-                var usr = parameter as String;
-                
-                if (usr != null)
+                if (CanExecute(parameter))
                 {
-                    Data.DataSource.Current.Disconnect(String.IsNullOrEmpty(usr) ? null : usr);
+                    Data.DataSource.Current.Disconnect();
                 }
             }
         }

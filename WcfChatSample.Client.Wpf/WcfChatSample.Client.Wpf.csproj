@@ -66,12 +66,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\DisconnectUserCommand.cs" />
     <Compile Include="Commands\ShowLoginWindowCommand.cs" />
     <Compile Include="Commands\ConnectCommand.cs" />
     <Compile Include="Commands\DisconnectCommand.cs" />
     <Compile Include="Commands\RefreshCommand.cs" />
-    <Compile Include="Converters\ChatMessageConverter.cs" />
-    <Compile Include="Data\UserEntity.cs" />
     <Compile Include="Data\UserLogin.cs" />
     <Compile Include="Extensions\SecureStringExtension.cs" />
     <Compile Include="LoginWindow.xaml.cs">

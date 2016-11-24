@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="ChatService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsp:Policy wsu:Id="NetTcpBinding_IChatService_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <msb:BinaryEncoding xmlns:msb="http://schemas.microsoft.com/ws/06/2004/mspolicy/netbinary1">
+        </msb:BinaryEncoding>
+        <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <wsp:Policy>
+            <sp:TransportToken>
+              <wsp:Policy>
+                <msf:WindowsTransportSecurity xmlns:msf="http://schemas.microsoft.com/ws/2006/05/framing/policy">
+                  <msf:ProtectionLevel>EncryptAndSign</msf:ProtectionLevel>
+                </msf:WindowsTransportSecurity>
+              </wsp:Policy>
+            </sp:TransportToken>
+            <sp:AlgorithmSuite>
+              <wsp:Policy>
+                <sp:Basic256>
+                </sp:Basic256>
+              </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+              <wsp:Policy>
+                <sp:Strict>
+                </sp:Strict>
+              </wsp:Policy>
+            </sp:Layout>
+          </wsp:Policy>
+        </sp:TransportBinding>
+        <wsaw:UsingAddressing>
+        </wsaw:UsingAddressing>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import namespace="http://tempuri.org/" />
+      <xsd:import namespace="http://schemas.datacontract.org/2004/07/WcfChatSample.Service" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IChatService_Login_InputMessage">
+    <wsdl:part name="parameters" element="tns:Login" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Login_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LoginResponse" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Login_ServerInternalFaultFault_FaultMessage">
+    <wsdl:part xmlns:q1="http://schemas.datacontract.org/2004/07/WcfChatSample.Service" name="detail" element="q1:ServerInternalFault" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Login_UserLoginFaultFault_FaultMessage">
+    <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/WcfChatSample.Service" name="detail" element="q2:UserLoginFault" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Post_InputMessage">
+    <wsdl:part name="parameters" element="tns:Post" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Post_OutputMessage">
+    <wsdl:part name="parameters" element="tns:PostResponse" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Post_UserLoginRequiredFaultFault_FaultMessage">
+    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/WcfChatSample.Service" name="detail" element="q3:UserLoginRequiredFault" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Post_ServerInternalFaultFault_FaultMessage">
+    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/WcfChatSample.Service" name="detail" element="q4:ServerInternalFault" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Post_UserSessionTimeoutFaultFault_FaultMessage">
+    <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/WcfChatSample.Service" name="detail" element="q5:UserSessionTimeoutFault" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_DisconnectUser_InputMessage">
+    <wsdl:part name="parameters" element="tns:DisconnectUser" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_DisconnectUser_OutputMessage">
+    <wsdl:part name="parameters" element="tns:DisconnectUserResponse" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_DisconnectUser_UserLoginRequiredFaultFault_FaultMessage">
+    <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/WcfChatSample.Service" name="detail" element="q6:UserLoginRequiredFault" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_DisconnectUser_UserSessionTimeoutFaultFault_FaultMessage">
+    <wsdl:part xmlns:q7="http://schemas.datacontract.org/2004/07/WcfChatSample.Service" name="detail" element="q7:UserSessionTimeoutFault" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Refresh_InputMessage">
+    <wsdl:part name="parameters" element="tns:Refresh" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Refresh_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RefreshResponse" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Refresh_UserSessionTimeoutFaultFault_FaultMessage">
+    <wsdl:part xmlns:q8="http://schemas.datacontract.org/2004/07/WcfChatSample.Service" name="detail" element="q8:UserSessionTimeoutFault" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Refresh_ServerInternalFaultFault_FaultMessage">
+    <wsdl:part xmlns:q9="http://schemas.datacontract.org/2004/07/WcfChatSample.Service" name="detail" element="q9:ServerInternalFault" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_Refresh_UserLoginRequiredFaultFault_FaultMessage">
+    <wsdl:part xmlns:q10="http://schemas.datacontract.org/2004/07/WcfChatSample.Service" name="detail" element="q10:UserLoginRequiredFault" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_OnMessagePost_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnMessagePost" />
+  </wsdl:message>
+  <wsdl:message name="IChatService_OnUsersListChange_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:OnUsersListChange" />
+  </wsdl:message>
+  <wsdl:portType msc:usingSession="true" name="IChatService">
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Login">
+      <wsdl:input wsaw:Action="http://tempuri.org/IChatService/Login" message="tns:IChatService_Login_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IChatService/LoginResponse" message="tns:IChatService_Login_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IChatService/LoginServerInternalFaultFault" name="ServerInternalFaultFault" message="tns:IChatService_Login_ServerInternalFaultFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IChatService/LoginUserLoginFaultFault" name="UserLoginFaultFault" message="tns:IChatService_Login_UserLoginFaultFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Post">
+      <wsdl:input wsaw:Action="http://tempuri.org/IChatService/Post" message="tns:IChatService_Post_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IChatService/PostResponse" message="tns:IChatService_Post_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IChatService/PostUserLoginRequiredFaultFault" name="UserLoginRequiredFaultFault" message="tns:IChatService_Post_UserLoginRequiredFaultFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IChatService/PostServerInternalFaultFault" name="ServerInternalFaultFault" message="tns:IChatService_Post_ServerInternalFaultFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IChatService/PostUserSessionTimeoutFaultFault" name="UserSessionTimeoutFaultFault" message="tns:IChatService_Post_UserSessionTimeoutFaultFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="DisconnectUser">
+      <wsdl:input wsaw:Action="http://tempuri.org/IChatService/DisconnectUser" message="tns:IChatService_DisconnectUser_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IChatService/DisconnectUserResponse" message="tns:IChatService_DisconnectUser_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IChatService/DisconnectUserUserLoginRequiredFaultFault" name="UserLoginRequiredFaultFault" message="tns:IChatService_DisconnectUser_UserLoginRequiredFaultFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IChatService/DisconnectUserUserSessionTimeoutFaultFault" name="UserSessionTimeoutFaultFault" message="tns:IChatService_DisconnectUser_UserSessionTimeoutFaultFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Refresh">
+      <wsdl:input wsaw:Action="http://tempuri.org/IChatService/Refresh" message="tns:IChatService_Refresh_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IChatService/RefreshResponse" message="tns:IChatService_Refresh_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IChatService/RefreshUserSessionTimeoutFaultFault" name="UserSessionTimeoutFaultFault" message="tns:IChatService_Refresh_UserSessionTimeoutFaultFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IChatService/RefreshServerInternalFaultFault" name="ServerInternalFaultFault" message="tns:IChatService_Refresh_ServerInternalFaultFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IChatService/RefreshUserLoginRequiredFaultFault" name="UserLoginRequiredFaultFault" message="tns:IChatService_Refresh_UserLoginRequiredFaultFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnMessagePost">
+      <wsdl:output wsaw:Action="http://tempuri.org/IChatService/OnMessagePost" message="tns:IChatService_OnMessagePost_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="OnUsersListChange">
+      <wsdl:output wsaw:Action="http://tempuri.org/IChatService/OnUsersListChange" message="tns:IChatService_OnUsersListChange_OutputCallbackMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="NetTcpBinding_IChatService" type="tns:IChatService">
+    <wsp:PolicyReference URI="#NetTcpBinding_IChatService_policy">
+    </wsp:PolicyReference>
+    <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="Login">
+      <soap12:operation soapAction="http://tempuri.org/IChatService/Login" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ServerInternalFaultFault">
+        <soap12:fault use="literal" name="ServerInternalFaultFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="UserLoginFaultFault">
+        <soap12:fault use="literal" name="UserLoginFaultFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Post">
+      <soap12:operation soapAction="http://tempuri.org/IChatService/Post" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="UserLoginRequiredFaultFault">
+        <soap12:fault use="literal" name="UserLoginRequiredFaultFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ServerInternalFaultFault">
+        <soap12:fault use="literal" name="ServerInternalFaultFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="UserSessionTimeoutFaultFault">
+        <soap12:fault use="literal" name="UserSessionTimeoutFaultFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="DisconnectUser">
+      <soap12:operation soapAction="http://tempuri.org/IChatService/DisconnectUser" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="UserLoginRequiredFaultFault">
+        <soap12:fault use="literal" name="UserLoginRequiredFaultFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="UserSessionTimeoutFaultFault">
+        <soap12:fault use="literal" name="UserSessionTimeoutFaultFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Refresh">
+      <soap12:operation soapAction="http://tempuri.org/IChatService/Refresh" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="UserSessionTimeoutFaultFault">
+        <soap12:fault use="literal" name="UserSessionTimeoutFaultFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ServerInternalFaultFault">
+        <soap12:fault use="literal" name="ServerInternalFaultFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="UserLoginRequiredFaultFault">
+        <soap12:fault use="literal" name="UserLoginRequiredFaultFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="OnMessagePost">
+      <soap12:operation soapAction="http://tempuri.org/IChatService/OnMessagePost" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OnUsersListChange">
+      <soap12:operation soapAction="http://tempuri.org/IChatService/OnUsersListChange" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ChatService">
+    <wsdl:port name="NetTcpBinding_IChatService" binding="tns:NetTcpBinding_IChatService">
+      <soap12:address location="net.tcp://localhost:8733/chat" />
+      <wsa10:EndpointReference>
+        <wsa10:Address>net.tcp://localhost:8733/chat</wsa10:Address>
+        <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
+          <Upn>X240\YKE</Upn>
+        </Identity>
+      </wsa10:EndpointReference>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

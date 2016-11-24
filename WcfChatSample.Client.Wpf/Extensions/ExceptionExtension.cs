@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 
@@ -27,8 +28,8 @@ namespace WcfChatSample.Client.Wpf.Extensions
                 }
             }
         }
-        
-        internal static void ShowMessage(this Exception e, string source = null)
+
+        internal static void ShowMessage(this Exception e, [CallerMemberName]string source = null)
         {
             Exception inner = e;
 
@@ -43,7 +44,7 @@ namespace WcfChatSample.Client.Wpf.Extensions
                 MessageBoxImage.Error);
         }
 
-        internal static void ShowMessage(this AggregateException e, string source = null)
+        internal static void ShowMessage(this AggregateException e, [CallerMemberName]string source = null)
         {
             var sb = new StringBuilder();
 

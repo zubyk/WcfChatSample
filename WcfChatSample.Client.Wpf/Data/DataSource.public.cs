@@ -39,9 +39,26 @@ namespace WcfChatSample.Client.Wpf.Data
             {
                 return _client != null;
             }
+            set
+            {
+                OnPropertyChanged();
+            }
         }
         
-        public bool IsAdmin { get; set; }
+        public bool IsAdmin 
+        { 
+            get {
+                return _isAdmin;
+            }
+            set
+            {
+                if (_isAdmin != value)
+                {
+                    _isAdmin = value;
+                    OnPropertyChanged();
+                }
+            } 
+        }
 
         public bool IsAsyncProcessing
         {
@@ -67,59 +84,90 @@ namespace WcfChatSample.Client.Wpf.Data
                 try
                 {
                     InitClient();
+                    _username = login.Username;
 
                     var creds = await login.SecurePassword.ProcessPasswordAsync(async (pass) => 
                     {
                         return await _client.LoginAsync(login.Username, pass);
                     });
-                    
-                    _key = creds.Key;
-                    _username = login.Username;
-                    IsAdmin = creds.IsAdmin;
-                    OnPropertyChanged("IsAdmin");
+                                        
+                    IsAdmin = creds.Role == UserRole.Admin;
                 }
                 catch (FaultException<UserLoginFault>)
                 {
                     CloseClient();
-                    new Exception("Invalid login or password").ShowMessage("Log in");
+                    new Exception("Invalid login or password").ShowMessage();
                 }
                 catch (FaultException<ServerInternalFault>)
                 {
                     CloseClient();
-                    new Exception("Internal server error").ShowMessage("Server");
+                    new Exception("Internal server error").ShowMessage();
                 }
                 catch (Exception e)
                 {
                     CloseClient();
-                    e.ShowMessage("Server connect");
+                    e.ShowMessage();
                 }
                 finally
                 {
                     IsAsyncProcessing = false;
-                    OnPropertyChanged("IsConnected");
                 }
 
                 Refresh();
             }
         }
 
-        public async void Disconnect(string username = null)
+        public void Disconnect() 
         {
             if (IsConnected && !IsAsyncProcessing)
             {
                 IsAsyncProcessing = true;
                 try
                 {
-                    await _client.DisconnectUserAsync(_key, username);
+                    CloseClient();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    e.ShowMessage();
                 }
                 finally
                 {
-                    CloseClient();
+                    Users.Clear();
                     IsAsyncProcessing = false;
-                    OnPropertyChanged("IsConnected");
+                }
+            }
+        }
+
+        public async void DisconnectUser(UserLogin user)
+        {
+            if (IsConnected && !IsAsyncProcessing && user != null && !user.IsSelf)
+            {
+                IsAsyncProcessing = true;
+                try
+                {
+                    await _client.DisconnectUserAsync(user.Username);
+                }
+                catch (FaultException<ServerInternalFault>)
+                {
+                    new Exception("Internal server error").ShowMessage("User disconnect");
+                }
+                catch (FaultException<UserLoginRequiredFault>)
+                {
+                    CloseClient();
+                    new Exception("User must log in first").ShowMessage("User disconnect");
+                }
+                catch (FaultException)
+                {
+                    CloseClient();
+                    new Exception("Session timeout").ShowMessage("User disconnect");
+                }
+                catch (Exception e)
+                {
+                    e.ShowMessage("User disconnect");
+                }
+                finally
+                {
+                    IsAsyncProcessing = false;
                 }
             }
         }
@@ -131,7 +179,7 @@ namespace WcfChatSample.Client.Wpf.Data
                 IsAsyncProcessing = true;
                 try
                 {
-                    var msgs = await _client.RefreshAsync(_key);
+                    var msgs = await _client.RefreshAsync();
                     
                     lock (_messages_lock)
                     {
@@ -142,17 +190,21 @@ namespace WcfChatSample.Client.Wpf.Data
                 }
                 catch (FaultException<ServerInternalFault>)
                 {
-                    new Exception("Internal server error").ShowMessage("Refresh");
+                    new Exception("Internal server error").ShowMessage();
+                }
+                catch (FaultException<UserLoginRequiredFault>)
+                {
+                    CloseClient();
+                    new Exception("User must log in first").ShowMessage();
                 }
                 catch (FaultException)
                 {
                     CloseClient();
-                    new Exception("Session timeout").ShowMessage("Refresh");
-                    OnPropertyChanged("IsConnected");
+                    new Exception("Session timeout").ShowMessage();
                 }
                 catch (Exception e)
                 {
-                    e.ShowMessage("Refresh");
+                    e.ShowMessage();
                 }
                 finally
                 {
@@ -168,22 +220,26 @@ namespace WcfChatSample.Client.Wpf.Data
                 IsAsyncProcessing = true;
                 try
                 {
-                    await _client.PostAsync(_key, message);
+                    await _client.PostAsync(message);
                     return true;
                 }
                 catch (FaultException<ServerInternalFault>)
                 {
-                    new Exception("Internal server error").ShowMessage("Post");
+                    new Exception("Internal server error").ShowMessage();
+                }
+                catch (FaultException<UserLoginRequiredFault>)
+                {
+                    CloseClient();
+                    new Exception("User must log in first").ShowMessage();
                 }
                 catch (FaultException)
                 {
                     CloseClient();
-                    new Exception("Session timeout").ShowMessage("Post");
-                    OnPropertyChanged("IsConnected");
+                    new Exception("Session timeout").ShowMessage();
                 }
                 catch (Exception e)
                 {
-                    e.ShowMessage("Post");
+                    e.ShowMessage();
                 }
                 finally
                 {

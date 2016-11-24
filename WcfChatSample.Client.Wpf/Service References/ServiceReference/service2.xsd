@@ -20,7 +20,6 @@
   <xs:element name="Post">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="message" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
@@ -33,7 +32,6 @@
   <xs:element name="DisconnectUser">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="username" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
@@ -45,9 +43,7 @@
   </xs:element>
   <xs:element name="Refresh">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="key" nillable="true" type="xs:string" />
-      </xs:sequence>
+      <xs:sequence />
     </xs:complexType>
   </xs:element>
   <xs:element name="RefreshResponse">
