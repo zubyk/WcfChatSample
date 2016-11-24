@@ -56,34 +56,40 @@ namespace WcfChatSample.Client.Wpf.Data
             {
                 lock (_messages_lock)
                 {
-                    if (Messages.Any())
-                    {
-                        foreach (var msg in e.OrderBy(m => m.Date))
-                        {
-                            for (var i = Messages.Count - 1; i >= 0; i--)
-                            {
-                                if (Messages[i].Date <= msg.Date)
-                                {
-                                    Messages.Insert(i + 1, msg);
-                                    break;
-                                }
-                                else if (i == 0)
-                                {
-                                    Messages.Insert(0, msg);
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (var msg in e.OrderBy(m => m.Date))
-                        {
-                            Messages.Add(msg);
-                        }
-                    }
+
+                    AddMessages(e);
                 }
 
                 OnPropertyChanged("Messages");
+            }
+        }
+
+        private void AddMessages(ChatMessage[] msgs)
+        {
+            if (Messages.Any())
+            {
+                foreach (var msg in msgs.OrderBy(m => m.Date))
+                {
+                    for (var i = Messages.Count - 1; i >= 0; i--)
+                    {
+                        if (Messages[i].Date <= msg.Date)
+                        {
+                            Messages.Insert(i + 1, msg);
+                            break;
+                        }
+                        else if (i == 0)
+                        {
+                            Messages.Insert(0, msg);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var msg in msgs.OrderBy(m => m.Date))
+                {
+                    Messages.Add(msg);
+                }
             }
         }
 

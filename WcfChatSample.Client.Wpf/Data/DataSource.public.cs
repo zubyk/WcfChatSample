@@ -113,7 +113,7 @@ namespace WcfChatSample.Client.Wpf.Data
                     IsAsyncProcessing = false;
                 }
 
-                Refresh();
+                Refresh(false);
             }
         }
 
@@ -172,7 +172,7 @@ namespace WcfChatSample.Client.Wpf.Data
             }
         }
 
-        public async void Refresh()
+        public async void Refresh(bool clear = true)
         {
             if (IsConnected && !IsAsyncProcessing)
             {
@@ -183,7 +183,14 @@ namespace WcfChatSample.Client.Wpf.Data
                     
                     lock (_messages_lock)
                     {
-                        Messages = new ObservableCollection<ChatMessage>(msgs.OrderBy(m => m.Date));
+                        if (clear)
+                        {
+                            Messages = new ObservableCollection<ChatMessage>(msgs.OrderBy(m => m.Date));
+                        }
+                        else
+                        {
+                            AddMessages(msgs);
+                        }
                     }
 
                     OnPropertyChanged("Messages");
